@@ -2,235 +2,238 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEVERQUE</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>I LUV YOU</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Prompt:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#1a0020}
+#page1{width:100%;height:100vh;display:flex;justify-content:center;align-items:center;position:relative;overflow:hidden}
+canvas#starsBg{position:absolute;inset:0;pointer-events:none}
+.box{position:relative;z-index:2;border:2px solid #d966ff;padding:38px 32px;width:330px;max-width:92vw;text-align:center;background:rgba(30,0,40,0.88);box-shadow:0 0 50px #c700ff88,inset 0 0 30px #ff00aa33}
+.dots{position:absolute;top:10px;left:12px;display:flex;gap:6px}
+.dots span{width:9px;height:9px;border-radius:50%;display:inline-block}
+.dots span:nth-child(1){background:#ff5f57}
+.dots span:nth-child(2){background:#febc2e}
+.dots span:nth-child(3){background:#28c840}
+.kitty-face{font-size:52px;margin-bottom:12px;animation:kittyBob 1.4s ease-in-out infinite}
+@keyframes kittyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.question{color:#fff;font-family:'Press Start 2P',monospace;font-size:11px;line-height:2.2;margin-bottom:24px;text-shadow:0 0 12px #ff99ddaa}
+.question span{color:#ec1fc0}
+.buttons{display:flex;justify-content:center;gap:14px}
+button{font-family:'Press Start 2P',monospace;font-size:9px;border:2px solid;padding:11px 18px;cursor:pointer;letter-spacing:1px;transition:transform .12s,box-shadow .12s}
+.yes{background:#cc00bb;color:#fff;border-color:#e9068a}
+.yes:hover{transform:scale(1.08);box-shadow:0 0 20px #ff66ff88}
+.no{background:#1a0020;color:#ff4444;border-color:#ff4444}
 
-  html, body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    font-family: Arial, Helvetica, sans-serif;
-  }
+#page2{display:none;width:100%;height:100vh;background:#1a0020;position:relative;overflow:hidden}
+#page2.show{display:block}
+canvas#heartCanvas{position:absolute;inset:0;width:100%;height:100%}
 
-  body {
-    position: relative;
-    background-color: #000;
-  }
+.center-photo-wrap{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:5;
+  width:160px;height:160px;
+  animation:bigBob 1.6s ease-in-out infinite;
+  pointer-events:none;
+}
 
-  /* Background layer (image or gif) */
-  .bg {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 0;
-    filter: grayscale(35%) brightness(0.55);
-  }
+.center-photo-wrap svg{position:absolute;width:0;height:0}
+.center-photo-img{
+  width:160px;height:160px;
+  object-fit:cover;
+  clip-path:url(#heartClip);
+  border:none;
+  display:block;
+}
 
-  .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 1;
-  }
+.center-photo-img.no-src{display:none}
+.center-kitty-fallback{
+  font-size:72px;
+  display:none;
+  animation:bigBob 1.6s ease-in-out infinite;
+}
+.center-kitty-fallback.show{display:block}
 
-  .topbar {
-    position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 3px;
-    width: 90px;
-    background: #3b6bff;
-    border-radius: 0 0 4px 4px;
-    z-index: 5;
-  }
+.heart-glow{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:180px;height:180px;
+  z-index:4;
+  pointer-events:none;
+  animation:glowPulse 1.6s ease-in-out infinite;
+}
+@keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 12px #ff66cc) drop-shadow(0 0 24px #cc44ff)}50%{filter:drop-shadow(0 0 22px #ff44bb) drop-shadow(0 0 40px #dd22ff)}}
 
-  /* Center content */
-  .center {
-    position: relative;
-    z-index: 2;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
+@keyframes bigBob{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-58%) scale(1.06)}}
 
-  /* Logo box: drop an image in to replace the N */
-  .logo-box {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-  .logo-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  /* Logo box is empty unless an image is added inside it */
+.love-text{
+  position:absolute;bottom:90px;left:50%;transform:translateX(-50%);
+  font-family:'Press Start 2P',monospace;font-size:10px;color:#ff99ee;
+  text-align:center;z-index:6;
+  text-shadow:0 0 14px #ff44bbaa;white-space:nowrap;transition:opacity 0.6s;
+}
+#musicBar{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);z-index:10;display:none;align-items:center;gap:10px}
+#musicBar.show{display:flex}
+#playBtn{font-family:'Press Start 2P',monospace;font-size:8px;background:rgba(80,0,100,0.7);border:1px solid #cc66ff88;color:#ff99ee;padding:8px 16px;cursor:pointer}
+#playBtn:hover{border-color:#ff88cc;color:#ff88cc}
 
-  .logo-label {
-    font-size: 12px;
-    letter-spacing: 6px;
-    color: #f2f2f2;
-    font-weight: 700;
-    margin-bottom: 36px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .logo-label .line {
-    width: 36px;
-    height: 1px;
-    background: #555;
-  }
-
-  /* Typewriter title */
-  .title {
-    font-family: 'Arial Black', Arial, sans-serif;
-    font-weight: 900;
-    font-style: italic;
-    font-size: 76px;
-    letter-spacing: 14px;
-    color: #fafafa;
-    display: flex;
-    align-items: center;
-    line-height: 1;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  .title .typed {
-    display: inline-block;
-    overflow: hidden;
-    white-space: nowrap;
-    width: 0;
-    animation: typeLoop 6s steps(8, end) infinite;
-  }
-
-  .title .cursor {
-    display: inline-block;
-    width: 4px;
-    height: 60px;
-    background: #fafafa;
-    margin-left: 16px;
-    animation: blink 0.9s step-end infinite;
-  }
-
-  @keyframes typeLoop {
-    0%   { width: 0; }
-    30%  { width: 9.5ch; }
-    60%  { width: 9.5ch; }
-    90%  { width: 0; }
-    100% { width: 0; }
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  @media (max-width: 720px) {
-    .title { font-size: 42px; letter-spacing: 8px; }
-    .title .cursor { height: 34px; }
-  }
-
-  /* Enter button */
-  .enter-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 52px;
-    padding: 14px 36px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 99px;
-    color: #fff;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    text-decoration: none;
-    cursor: pointer;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: background .25s, border-color .25s, transform .18s, box-shadow .25s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .enter-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%);
-    opacity: 0;
-    transition: opacity .25s;
-  }
-
-  .enter-btn:hover {
-    border-color: rgba(255,255,255,0.6);
-    box-shadow: 0 0 32px rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.5);
-    transform: translateY(-2px);
-  }
-
-  .enter-btn:hover::before { opacity: 1; }
-
-  .enter-btn:active { transform: translateY(0px); }
-
-  .enter-arrow {
-    display: flex;
-    align-items: center;
-    transition: transform .2s;
-  }
-
-  .enter-btn:hover .enter-arrow { transform: translateX(4px); }
+.snowflake{position:fixed;top:-40px;pointer-events:none;z-index:3;animation:snowfall linear forwards;user-select:none}
+@keyframes snowfall{0%{transform:translateY(0) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:.7}100%{transform:translateY(110vh) rotate(360deg);opacity:0}}
 </style>
 </head>
 <body>
 
-<!-- Background: replace src with your own image or .gif -->
-<img class="bg" src="background.gif" alt="">
-<div class="overlay"></div>
-
-<div class="topbar"></div>
-
-<div class="center">
-
-  <!-- Logo box is empty by default. To show a logo, add an image inside:
-       <div class="logo-box"><img src="your-logo.png" alt="logo"></div> -->
-  <div class="logo-box"></div>
-
-  <div class="logo-label">
-    <span class="line"></span>
-    NEVERQUESTAR
-    <span class="line"></span>
+<div id="page1">
+  <canvas id="starsBg"></canvas>
+  <div class="box">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="kitty-face">🐱</div>
+    <div class="question"><br>PI<span>NK</span><br><br><span style="font-size:30px;color:#cc99ff">ขอโทษเรื่องวันนี้ดีกันนะ</span></div>
+    <div class="buttons">
+      <button class="yes" onclick="startLove()">YES ♥</button>
+      <button class="no" id="noBtn" onmouseover="runAway()" ontouchstart="runAway()">NO</button>
+    </div>
   </div>
-
-  <div class="title">
-    <span class="typed">NEVERQUE</span>
-    <span class="cursor"></span>
-  </div>
-
-  <a class="enter-btn" href="Member.html">
-    ENTER
-    <span class="enter-arrow">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-    </span>
-  </a>
-
 </div>
 
+<div id="page2">
+  <canvas id="heartCanvas"></canvas>
+
+  <svg style="position:absolute;width:0;height:0">
+    <defs>
+      <clipPath id="heartClip" clipPathUnits="objectBoundingBox">
+        <path d="
+          M0.5,0.9
+          C0.1,0.65 0,0.45 0,0.3
+          C0,0.12 0.12,0 0.28,0
+          C0.37,0 0.46,0.07 0.5,0.15
+          C0.54,0.07 0.63,0 0.72,0
+          C0.88,0 1,0.12 1,0.3
+          C1,0.45 0.9,0.65 0.5,0.9Z
+        "/>
+      </clipPath>
+    </defs>
+  </svg>
+
+
+  <div class="center-photo-wrap">
+    <img class="center-photo-img" id="photoImg"
+      src="https://files.catbox.moe/arrbvy.jpg  "
+      alt="photo"
+      onerror="this.classList.add('no-src');document.getElementById('fallbackKitty').classList.add('show')"
+    >
+  </div>
+
+  <div class="center-kitty-fallback" id="fallbackKitty" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5">🐱</div>
+
+  <div class="love-text" id="loveText"></div>
+  <div id="musicBar">
+    <button id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+  </div>
+</div>
+
+<audio id="bgAudio" loop src="https://files.catbox.moe/kj4py0.mp4"></audio>
+
+<script>
+var sC=document.getElementById('starsBg'),sX=sC.getContext('2d'),ST=[];
+function initStars(){sC.width=innerWidth;sC.height=innerHeight;ST=[];for(var i=0;i<180;i++)ST.push({x:Math.random()*sC.width,y:Math.random()*sC.height,r:Math.random()*1.4+0.2,a:Math.random(),da:Math.random()*.014+.003,pk:Math.random()>.6});}
+function drawStars(){sX.clearRect(0,0,sC.width,sC.height);ST.forEach(function(s){s.a+=s.da;if(s.a>1||s.a<0)s.da*=-1;sX.globalAlpha=s.a*.75+.1;sX.fillStyle=s.pk?'#ffaaee':'#fff';sX.beginPath();sX.arc(s.x,s.y,s.r,0,Math.PI*2);sX.fill();});sX.globalAlpha=1;requestAnimationFrame(drawStars);}
+initStars();drawStars();window.addEventListener('resize',initStars);
+
+var audio=document.getElementById('bgAudio');
+function playMusic(){audio.volume=0;audio.play().catch(function(){});var v=0,fi=setInterval(function(){v+=0.04;if(v>=0.8){v=0.8;clearInterval(fi);}audio.volume=v;},80);}
+function togglePlay(){var btn=document.getElementById('playBtn');if(audio.paused){audio.play();btn.textContent='❚❚ PAUSE';}else{audio.pause();btn.textContent='▶ PLAY';}}
+
+
+function runAway(){var b=document.getElementById('noBtn');b.style.position='fixed';b.style.left=Math.random()*(innerWidth-120)+'px';b.style.top=Math.random()*(innerHeight-60)+'px';}
+
+function startLove(){
+  document.getElementById('page1').style.display='none';
+  document.getElementById('page2').classList.add('show');
+  document.getElementById('musicBar').classList.add('show');
+  playMusic();
+  setTimeout(initHeart,100);
+  startLoveText();
+}
+
+var loveMessages=['I LOVE YOU ♥','♡','♡','LUV U','♥ ♥ ♥'];
+var msgIdx=0;
+function startLoveText(){
+  var el=document.getElementById('loveText');
+  function next(){el.style.opacity=0;setTimeout(function(){el.textContent=loveMessages[msgIdx%loveMessages.length];msgIdx++;el.style.opacity=1;},400);}
+  next();setInterval(next,2800);
+}
+
+function initHeart() {
+  var cvs = document.getElementById('heartCanvas');
+  var W = innerWidth, H = innerHeight;
+  cvs.width = W; cvs.height = H;
+  var ctx = cvs.getContext('2d');
+  var cx = W / 2, cy = H / 2;
+
+  function hx(t, s) { return cx + s * 16 * Math.pow(Math.sin(t), 3); }
+  function hy(t, s) { return cy - s * (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)); }
+
+  var N = 60;
+  var pts = [];
+  for (var i = 0; i < N; i++) {
+    var t = i / N * Math.PI * 2;
+    var sc = 8 + Math.random() * 2;
+    pts.push({
+      tx: hx(t, sc),
+      ty: hy(t, sc),
+      x: cx + Math.random() * 60 - 20,
+      y: cy + Math.random() * 60 - 20,
+      alpha: 0,
+      delay: i * 3,
+      sz: 11 + Math.random() * 4,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.04 + Math.random() * 0.02
+    });
+  }
+
+  var frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i];
+      if (frame < p.delay) continue;
+      p.x = p.x + (p.tx - p.x) * 0.04;
+      p.y = p.y + (p.ty - p.y) * 0.04;
+      p.alpha = Math.min(1, p.alpha + 0.015);
+      var pulse = 0.65 + 0.35 * Math.sin(frame * p.speed + p.phase);
+      ctx.save();
+      ctx.globalAlpha = p.alpha * pulse;
+      ctx.font = 'bold ' + p.sz + 'px Georgia,serif';
+      ctx.fillStyle = '#f090c0';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('I love you', p.x, p.y);
+      ctx.restore();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+var snowChars=['♥','♡','🐾','✦','🐾','✦'];
+function createSnow(){
+  var s=document.createElement('div');
+  s.className='snowflake';
+  s.textContent=snowChars[Math.floor(Math.random()*snowChars.length)];
+  s.style.left=Math.random()*100+'vw';
+  s.style.fontSize=(Math.random()*12+10)+'px';
+  s.style.color=['#ff88cc','#dd66ff','#ffaaee','#cc44ff'][Math.floor(Math.random()*4)];
+  s.style.opacity=Math.random()*.5+.2;
+  s.style.animationDuration=(Math.random()*7+5)+'s';
+  document.body.appendChild(s);
+  setTimeout(function(){s.remove();},13000);
+}
+setInterval(createSnow,450);
+for(var i=0;i<10;i++)setTimeout(createSnow,i*250);
+</script>
 </body>
 </html>
